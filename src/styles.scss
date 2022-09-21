@@ -1,0 +1,342 @@
+// =============================================================================
+//                             MADE BY TOM PLANCHE
+//                            tomplanche@icloud.com
+//                            github.com/tomPlanche
+// =============================================================================
+@import "scss/reset";
+@import "scss/base";
+
+
+@font-face {
+  font-family: "PP Mondwest";
+  src: url("./fonts/PP Mondwest/PPMondwest-Bold.woff2") format("woff2");
+  font-weight: bold;
+  font-style: normal;
+}
+@font-face {
+  font-family: "PP Mondwest";
+  src: url("./fonts/PP Mondwest/PPMondwest-Regular.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: "PP NeueBit";
+  src: url("./fonts/PP NeueBit/PPNeueBit-Bold.woff2") format("woff2");
+  font-weight: bold;
+  font-style: normal;
+}
+@font-face {
+  font-family: "PP NeueBit";
+  src: url("./fonts/PP NeueBit/PPNeueBit-Regular.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+}
+
+// -------------------------------- VARIABLES ----------------------------------
+$black: rgba(17, 17, 17, 0.65);
+$white: #eee;
+$blue: #7EC8E3;
+$red: #D92323;
+$red-hovered: #F71414;
+
+$header-height: 8vh;
+
+
+$button-border-radius: 40px;
+$button-bg: transparent;
+$button-stroke-width: 1px;
+$button-stroke-width-hover: 1px;
+
+$cursor-stroke: #fff;
+$cursor-fill: #fff;
+$cursor-stroke-width: 1px;
+// ------------------------------ END VARIABLES --------------------------------
+
+
+// ---------------------------------- CODE -------------------------------------
+html {
+  font-size: 100%;
+}
+
+body {
+  width: 100vw;
+
+  padding: 0;
+  margin: 0;
+
+  // Hide scrollbar
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+
+  background: lightskyblue;
+
+  // Hide scrollbar
+  &::-webkit-scrollbar { /* WebKit & blink */
+    width: 0;
+    height: 0;
+  }
+
+  header {
+    height: $header-height;
+    width: 100vw;
+
+    position: fixed;
+    top: 0;
+
+    background: $black;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+
+    color: $blue;
+
+    svg {
+      height: 100%;
+      width: auto;
+    }
+
+    padding: 0 1rem;
+
+  }
+
+  main {
+    height: 100vh;
+    width: 100vw;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    padding: $header-height 0;
+
+    .currently-playing {
+      height: 5rem;
+      width: auto;
+      min-width: 15rem;
+
+      position: fixed;
+
+      bottom: 0;
+      right: 0;
+
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+
+      transition: all 0.5s ease-in-out;
+
+
+      margin: .25rem;
+
+      // Blurry background
+      background-color: #11111199;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px); // Compatible with Safari
+
+      border-radius: 1rem;
+
+      img {
+        height: 100%;
+        width: auto;
+
+        border-radius: 1rem;
+
+        margin-right: 1rem;
+      }
+
+      .infos {
+        height: 100%;
+        width: 100%;
+
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+
+        padding: 0 1rem;
+
+        h1 {
+          width: 100%;
+          font-family: "PP NeueBit";
+          font-size: 1.75rem;
+          font-weight: bold;
+          color: $white;
+          text-align: left;
+        }
+
+        h2 {
+          width: 100%;
+          font-family: "PP NeueBit";
+          font-size: 1.25rem;
+          font-weight: normal;
+          color: $white;
+          text-align: left;
+        }
+      }
+    }
+
+    .user {
+      height: 20vh;
+      width: 100%;
+
+      background: hotpink;
+
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+
+      padding-right: 5rem;
+
+      img {
+        height: 100%;
+        width: auto;
+
+        border-radius: 1rem;
+      }
+
+      .user-infos {
+        margin: 0 auto;
+        h1 {
+          font-family: "PP NeueBit";
+          font-size: 3rem;
+          font-weight: bold;
+          color: $white;
+          text-align: left;
+        }
+
+        p {
+          font-family: "PP NeueBit";
+          font-size: 2rem;
+          font-weight: normal;
+          color: $white;
+          text-align: left;
+        }
+      }
+    }
+  }
+
+  footer {
+    height: 8vh;
+    width: 100vw;
+
+    background: hotpink;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+// CUSTOM BUTTON --------------------------------------------------------------
+.button {
+  min-width: 7rem;
+  height: 3rem;
+
+  -moz-appearance: none;
+  -webkit-appearance: none;
+
+  border-width: $button-stroke-width;
+  border-color: $white;
+  border-style: solid;
+  border-radius: $button-border-radius;
+
+  color: $white;
+
+  background: $red;
+
+  padding: 1rem;
+  margin: 1rem;
+
+  font-family: inherit;
+  font-size: 1rem;
+
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:focus,
+  &.button--hover {
+    outline: none;
+    border-width: $button-stroke-width-hover;
+    border-color: $white;
+    background: $red-hovered;
+  }
+
+  .button__filler {
+    width: 150%;
+    height: 200%;
+
+    position: absolute;
+
+    background: $red-hovered;
+    border-radius: 50%;
+
+    top: -50%;
+    left: -25%;
+    transform: translate3d(0,75%,0);
+  }
+
+  .button__text,
+  .button__text-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+
+    color: $white;
+  }
+}
+// END CUSTOM BUTTON ----------------------------------------------------------
+
+// CUSTOM CURSOR --------------------------------------------------------------
+.cursor {
+  display: none;
+  height: 25px;
+  width: 25px;
+
+  z-index: 666;
+}
+
+@media (any-pointer: fine) {
+  .cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: block;
+    pointer-events: none;
+  }
+  .cursor__inner {
+    fill: $cursor-fill;
+    stroke: $cursor-stroke;
+    stroke-width: $cursor-stroke-width;
+  }
+}
+// END CUSTOM CURSOR ----------------------------------------------------------
+
+* {
+  text-decoration: none;
+  font-weight: normal;
+
+  margin: 0;
+  padding: 0;
+
+  box-sizing: border-box;
+
+  font-family: 'Fira Code', monospace;
+}
+// -------------------------------- END CODE -----------------------------------
