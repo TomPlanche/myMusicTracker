@@ -11,12 +11,13 @@ import {
   getMousePos,
   distance,
   getRandomFloat
-} from "./js/myFuncs.js";
+} from "./js/myUsualFuncs.js";
 
 import { LAST_FM_API_KEY, LAST_FM_API_SECRET, XHR_AUTH } from "./js/secrets.js";
 
 import ButtonCtrl from "./js/buttonControl.js";
 import customCursor from "./js/customCursor.js";
+import CurrentlyPlaying from "./js/currentlyPlayingControl.js";
 
 gsap.registerPlugin(
 	ScrambleTextPlugin,
@@ -40,14 +41,14 @@ const blinkingEmojiSvg = `<svg id="topLeftEmoji" xmlns="http://www.w3.org/2000/s
 const topLeftEmoji = document.querySelector("#topLeftEmoji");
 
 let lastPlayed = undefined;
-let currentlyPlayingDiv = undefined;
+let currentlyPlayingPlayer = undefined;
 
 const cursor = new customCursor(document.querySelector('.cursor'));
 const buttonMenu = new ButtonCtrl(
 		document.querySelector('.button'),
 		{
 			customCursor: cursor,
-			distanceNeededToTrigger: .3
+			distanceToLeave: .5
 		}
 );
 // ------------------------------ END VARIABLES --------------------------------
@@ -121,10 +122,21 @@ const handleUserData = (data) => {
 	lastPlayed = scrobbleList[0];
 	
 	if (lastPlayed["@attr"] !== undefined && lastPlayed["@attr"].nowplaying === "true") {
-		if (currentlyPlayingDiv === undefined) {
-			displayCurrentlyPlaying(lastPlayed);
+		const artist = lastPlayed.artist["#text"];
+		const track = lastPlayed.name;
+		const album = lastPlayed.album["#text"];
+		const image = lastPlayed.image[3]["#text"];
+		const url = lastPlayed.url;
+		
+		if (currentlyPlayingPlayer === undefined) {
+			currentlyPlayingPlayer = new CurrentlyPlaying(image, track, artist, url);
+			currentlyPlayingPlayer.display();
 		} else {
-			changeCurrentlyPlayingInfos(lastPlayed);
+			currentlyPlayingPlayer.update(image, track, artist, url);
+		}
+	} else {
+		if (currentlyPlayingPlayer !== undefined) {
+			currentlyPlayingPlayer.remove();
 		}
 	}
 }
@@ -141,92 +153,31 @@ const handleUserInfo = (userData) => {
 }
 
 
-const displayCurrentlyPlaying = (lastPlayed) => {
-	const artist = lastPlayed.artist["#text"];
-	const track = lastPlayed.name;
-	const album = lastPlayed.album["#text"];
-	const image = lastPlayed.image[3]["#text"];
-	const url = lastPlayed.url;
-	
-	// Here's the wanted html structure:
-	/*
-	<div className="currently-playing">
-	     <img src="https://lastfm.freetls.fastly.net/i/u/300x300/0fa39163964da76f9f77f38d5ae7b61b.jpg" alt="">
-       <div className="infos">
-           <h1>Titre</h1>
-           <h2>Artiste</h2>
-       </div>
-   </div>
-   */
-	const currentlyPlaying = document.createElement("div");
-	currentlyPlaying.classList.add("currently-playing");
-	
-	const img = document.createElement("img");
-	img.src = image;
-	img.alt = `${album} cover by ${artist}`;
-	
-	const infos = document.createElement("div");
-	infos.classList.add("infos");
-	
-	const title = document.createElement("h1");
-	title.innerText = track;
-	
-	const artistName = document.createElement("h2");
-	artistName.innerText = artist;
-	
-	infos.appendChild(title);
-	infos.appendChild(artistName);
-	
-	currentlyPlaying.appendChild(img);
-	currentlyPlaying.appendChild(infos);
-	
-	document.querySelector("main").appendChild(currentlyPlaying);
-	
-	currentlyPlaying.addEventListener("click", () => {
-		window.open(url, "_blank");
-	});
-	
-	handdleCurrentlyPlayingHover();
-	
-	currentlyPlayingDiv = currentlyPlaying;
-}
+const setBackgroundLikeCurrentSongCover = async (imageUrl) => {
+	const url = `https://api.imagga.com/v2/colors?image_url=${imageUrl}`;
 
-const changeCurrentlyPlayingInfos = (lastPlayed) => {
-	const artist = lastPlayed.artist["#text"];
-	const track = lastPlayed.name;
-	const album = lastPlayed.album["#text"];
-	const image = lastPlayed.image[3]["#text"];
-	const url = lastPlayed.url;
+	let xhr = new XMLHttpRequest();
+	xhr.open("GET", url);
+	xhr.setRequestHeader("Authorization", XHR_AUTH);
 	
-	const img = currentlyPlayingDiv.querySelector("img");
-	img.src = image;
-	
-	const title = currentlyPlayingDiv.querySelector("h1");
-	title.innerText = track;
-	
-	const artistName = currentlyPlayingDiv.querySelector("h2");
-	artistName.innerText = artist;
-	
-	currentlyPlayingDiv.addEventListener("click", () => {
-		window.open(url, "_blank");
+	let color_data = await new Promise((resolve, reject) => {
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState === 4) {
+				if (xhr.status === 200) {
+					resolve(JSON.parse(xhr.responseText));
+				} else {
+					reject(xhr.status);
+				}
+			}
+		}
+		xhr.send();
 	});
 	
-	handdleCurrentlyPlayingHover();
-}
-
-const handdleCurrentlyPlayingHover = () => {
-	currentlyPlayingDiv.addEventListener("mouseenter", () => {
-		console.log("enter");
-		cursor.enter();
-		currentlyPlayingDiv.style.width *= 1.5;
-		currentlyPlayingDiv.style.height *= 1.5;
-	});
+	const background_colors = color_data.result.colors.background_colors.map(color => color.html_code);
 	
-	currentlyPlayingDiv.addEventListener("mouseleave", () => {
-		cursor.leave();
-		currentlyPlayingDiv.style.width /= 1.5;
-		currentlyPlayingDiv.style.height /= 1.5;
-	});
+	// Change the background color of the body to a gradient of the colors in background_colors
+	const background_color_gradient = `linear-gradient(45deg, ${background_colors.join(", ")}`;
+	document.querySelector("body").style.background = background_color_gradient;
 }
 // ------------------------------ END FUNCTIONS --------------------------------
 

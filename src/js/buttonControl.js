@@ -1,5 +1,5 @@
 
-import { lerp, getMousePos, calcWinsize, distance } from "./myFuncs.js";
+import { lerp, getMousePos, calcWinsize, verifyIsInBounds } from "./myUsualFuncs.js";
 
 // Calculate the viewport size
 let winsize = calcWinsize();
@@ -29,8 +29,8 @@ export default class ButtonCtrl {
      * @param customCursor - If true, the button will send the button events to the cursor.
      */
     constructor(
-        el,
-        options = undefined
+            el,
+            options = undefined
         ) {
         // DOM elements
         // el: main button
@@ -42,7 +42,8 @@ export default class ButtonCtrl {
         
         let acceptedOptions = {
             customCursor: undefined,
-            distanceNeededToTrigger: 0.5
+            distanceNeededToTrigger: 1.2,
+            distanceToLeave: .5
         }
         /**
          * Accepted options:
@@ -87,9 +88,6 @@ export default class ButtonCtrl {
     calculateSizePosition() {
         // size/position
         this.rect = this.DOM.el.getBoundingClientRect();
-
-				// the movement will take place when the distance from the mouse to the center of the button is lower than this value
-        this.distanceToTrigger = this.rect.width*this.acceptedOptions.distanceNeededToTrigger;
     }
     
     /**
@@ -112,20 +110,22 @@ export default class ButtonCtrl {
      * Render function.
      */
     render() {
-        // calculate the distance from the mouse to the center of the button
-        const distanceMouseButton = distance(mousepos.x+window.scrollX, mousepos.y+window.scrollY, this.rect.left + this.rect.width/2, this.rect.top + this.rect.height/2);
+        const distanceToTriggerFromBounds =
+            this.acceptedOptions.distanceNeededToTrigger < 1 ? 1 + this.acceptedOptions.distanceNeededToTrigger : this.acceptedOptions.distanceNeededToTrigger;
+        
+        
         // new values for the translations
         let x = 0;
         let y = 0;
 
-        if ( distanceMouseButton < this.distanceToTrigger ) {
+        if (verifyIsInBounds(mousepos, this.rect, distanceToTriggerFromBounds)) {
             if ( !this.state.hover ) {
                 this.enter();
             }
-            x = (mousepos.x + window.scrollX - (this.rect.left + this.rect.width/2))*this.acceptedOptions.distanceNeededToTrigger;
-            y = (mousepos.y + window.scrollY - (this.rect.top + this.rect.height/2))*this.acceptedOptions.distanceNeededToTrigger;
+            x = (mousepos.x + window.scrollX - (this.rect.left + this.rect.width / 2)) * this.acceptedOptions.distanceToLeave;
+            y = (mousepos.y + window.scrollY - (this.rect.top + this.rect.height / 2)) * this.acceptedOptions.distanceToLeave;
         }
-        else if ( this.state.hover ) {
+        else if ( verifyIsInBounds(mousepos, this.rect, this.acceptedOptions.distanceToLeave) ) {
             this.leave();
         }
 

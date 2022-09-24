@@ -1,5 +1,5 @@
 
-import { lerp, getMousePos } from "./myFuncs.js";
+import { lerp, getMousePos } from "./myUsualFuncs.js";
 
 // Track the mouse position
 let mouse = {x: 0, y: 0};
