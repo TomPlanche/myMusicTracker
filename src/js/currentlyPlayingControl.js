@@ -1,5 +1,5 @@
 
-import { lerp, getMousePos, calcWinsize, distance } from "./myUsualFuncs.js";
+import { lerp, getMousePos, calcWinsize, distance } from "./myFuncs.js";
 
 // Calculate the viewport size
 let winsize = calcWinsize();
@@ -79,16 +79,12 @@ export default class CurrentlyPlaying {
 	
 	render() {
 		if (this.state.displayed) {
-			// calculate the distance from the mouse to the center of the button
-	    const distanceMouseButton = distance(
-					mousepos.x + window.scrollX,
-		      mousepos.y + window.scrollY,
-		      this.rect.left + this.rect.width / 2,
-		      this.rect.top + this.rect.height / 2
-	    );
-			
 			// check if the mouse is in the element bounds
-	    const mouseInButton = mousepos.x + window.scrollX >= this.rect.left && mousepos.x + window.scrollX <= this.rect.left + this.rect.width && mousepos.y + window.scrollY >= this.rect.top && mousepos.y + window.scrollY <= this.rect.top + this.rect.height;
+	    const mouseInButton =
+			    mousepos.x + window.scrollX >= this.rect.left &&
+			    mousepos.x + window.scrollX <= this.rect.left + this.rect.width &&
+			    mousepos.y + window.scrollY >= this.rect.top &&
+			    mousepos.y + window.scrollY <= this.rect.top + this.rect.height;
 			
 			// update the state
 			if (mouseInButton && !this.state.hover) {
@@ -118,7 +114,7 @@ export default class CurrentlyPlaying {
 		
 		this.state.displayed = true;
 		
-		window.addEventListener('click', () => {
+		this.DOM.el.addEventListener('click', () => {
 			window.open(this.url, "_blank");
 		})
 		

@@ -11,7 +11,7 @@ import {
   getMousePos,
   distance,
   getRandomFloat
-} from "./js/myUsualFuncs.js";
+} from "./js/myFuncs.js";
 
 import { LAST_FM_API_KEY, LAST_FM_API_SECRET, XHR_AUTH } from "./js/secrets.js";
 
@@ -45,10 +45,10 @@ let currentlyPlayingPlayer = undefined;
 
 const cursor = new customCursor(document.querySelector('.cursor'));
 const buttonMenu = new ButtonCtrl(
-		document.querySelector('.button'),
+		document.querySelector('#seeAccountButton'),
 		{
 			customCursor: cursor,
-			distanceToLeave: .5
+			distanceNeededToTrigger: 1
 		}
 );
 // ------------------------------ END VARIABLES --------------------------------
@@ -146,10 +146,15 @@ const handleUserInfo = (userData) => {
 	const name = userData.user.name;
 	const pp_url = userData.user.image[userData.user.image.length - 2]["#text"];
 	const scrobbles = userData.user.playcount;
+	const url = userData.user.url;
 	
 	document.querySelector("#imgUser").textContent = pp_url;
 	document.querySelector("#accountName").textContent = name;
 	document.querySelector("#scrobbleNb").textContent = scrobbles;
+	
+	buttonMenu.onClick(() => {
+		window.open(url, "_blank");
+	});
 }
 
 

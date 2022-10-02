@@ -6,32 +6,6 @@
 @import "scss/reset";
 @import "scss/base";
 
-
-@font-face {
-  font-family: "PP Mondwest";
-  src: url("./fonts/PP Mondwest/PPMondwest-Bold.woff2") format("woff2");
-  font-weight: bold;
-  font-style: normal;
-}
-@font-face {
-  font-family: "PP Mondwest";
-  src: url("./fonts/PP Mondwest/PPMondwest-Regular.woff2") format("woff2");
-  font-weight: normal;
-  font-style: normal;
-}
-@font-face {
-  font-family: "PP NeueBit";
-  src: url("./fonts/PP NeueBit/PPNeueBit-Bold.woff2") format("woff2");
-  font-weight: bold;
-  font-style: normal;
-}
-@font-face {
-  font-family: "PP NeueBit";
-  src: url("./fonts/PP NeueBit/PPNeueBit-Regular.woff2") format("woff2");
-  font-weight: normal;
-  font-style: normal;
-}
-
 // -------------------------------- VARIABLES ----------------------------------
 $black: rgba(17, 17, 17, 0.65);
 $white: #eee;
@@ -75,7 +49,7 @@ body {
 
   box-sizing: border-box;
 
-  background: lightskyblue;
+  background: $black;
 
   // Hide scrollbar
   &::-webkit-scrollbar { /* WebKit & blink */
@@ -189,7 +163,7 @@ body {
       height: 20vh;
       width: 100%;
 
-      background: hotpink;
+      background: $black;
 
       display: flex;
       flex-direction: row;
@@ -230,12 +204,14 @@ body {
     height: 8vh;
     width: 100vw;
 
-    background: hotpink;
+    background: $black;
 
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
+
+    color: $white;
   }
 }
 
@@ -255,6 +231,8 @@ body {
   color: $white;
 
   background: $red;
+
+  z-index: 100;
 
   padding: 1rem;
   margin: 1rem;

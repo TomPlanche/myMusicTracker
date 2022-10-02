@@ -54,6 +54,14 @@ const distance = (x1,y1,x2,y2) => {
  */
 const getRandomFloat = (min, max) => (Math.random() * (max - min) + min).toFixed(2);
 
+
+/**
+ * Verify if the mouse is in the bounds
+ * @param mousepos - The mouse position. {x: number, y: number}
+ * @param rect - The element's bounding rectangle. {left: number, top: number, width: number, height: number}
+ * @param boundsExtention - The bounds extention.
+ * @returns {boolean} - True if the mouse is in the bounds.
+ */
 const verifyIsInBounds = (
     mousepos,
     rect,
@@ -63,7 +71,7 @@ const verifyIsInBounds = (
         mousepos.x <= rect.right * boundsExtention &&
         mousepos.y >= rect.top / boundsExtention &&
         mousepos.y <= rect.bottom * boundsExtention;
-    }
+}
 
 export {
     calcWinsize,

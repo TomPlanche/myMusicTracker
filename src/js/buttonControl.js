@@ -1,5 +1,5 @@
 
-import { lerp, getMousePos, calcWinsize, verifyIsInBounds } from "./myUsualFuncs.js";
+import {lerp, getMousePos, calcWinsize, distance, verifyIsInBounds} from "./myFuncs.js";
 
 // Calculate the viewport size
 let winsize = calcWinsize();
@@ -25,8 +25,11 @@ window.addEventListener('mousemove', ev => mousepos = getMousePos(ev));
 export default class ButtonCtrl {
     /**
      * ButtonCtrl constructor.
-     * @param el - The button element.
-     * @param customCursor - If true, the button will send the button events to the cursor.
+     * @param el - The button DOM element.
+     * @param options - Options for the button.
+     * Accepted options:
+     *    - customCursor: if not undefined, the button will send the button events to the cursor.
+     *    - distanceNeededToTrigger: the movement will take place when the distance from the mouse to the center of the button is lower than this value.
      */
     constructor(
             el,
@@ -39,18 +42,13 @@ export default class ButtonCtrl {
         this.DOM.filler = this.DOM.el.querySelector('.button__filler');
         this.DOM.text = this.DOM.el.querySelector('.button__text');
         this.DOM.textinner = this.DOM.el.querySelector('.button__text-inner');
-        
+
         let acceptedOptions = {
             customCursor: undefined,
             distanceNeededToTrigger: 1.2,
             distanceToLeave: .5
         }
-        /**
-         * Accepted options:
-         *
-         * - customCursor: if not undefined, the button will send the button events to the cursor.
-         * - distanceNeededToTrigger: the movement will take place when the distance from the mouse to the center of the button is lower than this value.
-         */
+        
         if (options !== undefined) {
             for (const [key, value] of Object.entries(options)) {
                 if (key in acceptedOptions) {
@@ -69,8 +67,11 @@ export default class ButtonCtrl {
 
 				// button state (hover)
         this.state = {
-            hover: false
+            hover: false,
+            focus: false
         };
+
+        this.distanceNeededToTrigger = .5;
 
 				// calculate size/position
         this.calculateSizePosition();
@@ -94,8 +95,22 @@ export default class ButtonCtrl {
      * Initialize the events.
      */
     initEvents() {
-        this.onResize = () => this.calculateSizePosition();
-        window.addEventListener('resize', this.onResize);
+        // this.DOM.el.addEventListener('focus', () => {
+        //     this.enter();
+        //     this.state.focus = true;
+        //     setTimeout(() => {
+        //         this.leave();
+        //         this.state.focus = false;
+        //     }, 5000);
+        // });
+        //
+        // this.DOM.el.addEventListener('blur', () => {
+        //     this.state.focus = false;
+        //     this.leave();
+        // });
+        
+        window.addEventListener('resize', () => this.calculateSizePosition());
+        window.addEventListener('scroll', () => this.calculateSizePosition);
     }
     
     /**
@@ -110,35 +125,29 @@ export default class ButtonCtrl {
      * Render function.
      */
     render() {
-        const distanceToTriggerFromBounds =
-            this.acceptedOptions.distanceNeededToTrigger < 1 ? 1 + this.acceptedOptions.distanceNeededToTrigger : this.acceptedOptions.distanceNeededToTrigger;
-        
-        
         // new values for the translations
         let x = 0;
         let y = 0;
-
-        if (verifyIsInBounds(mousepos, this.rect, distanceToTriggerFromBounds)) {
-            if ( !this.state.hover ) {
-                this.enter();
-            }
-            x = (mousepos.x + window.scrollX - (this.rect.left + this.rect.width / 2)) * this.acceptedOptions.distanceToLeave;
-            y = (mousepos.y + window.scrollY - (this.rect.top + this.rect.height / 2)) * this.acceptedOptions.distanceToLeave;
+    
+        if ( verifyIsInBounds(mousepos, this.rect, this.acceptedOptions.distanceNeededToTrigger) ) {
+            if ( !this.state.hover ) { this.enter(); }
+            x = (mousepos.x - (this.rect.left + this.rect.width / 2)) * this.acceptedOptions.distanceNeededToTrigger;
+            y = (mousepos.y - (this.rect.top + this.rect.height / 2)) * this.acceptedOptions.distanceNeededToTrigger;
         }
-        else if ( verifyIsInBounds(mousepos, this.rect, this.acceptedOptions.distanceToLeave) ) {
+        else if ( this.state.hover && !this.state.focus ) {
             this.leave();
         }
-
+    
         this.renderedStyles['tx'].current = x;
         this.renderedStyles['ty'].current = y;
-
+    
         for (const key in this.renderedStyles ) {
             this.renderedStyles[key].previous = lerp(this.renderedStyles[key].previous, this.renderedStyles[key].current, this.renderedStyles[key].amt);
         }
-
+    
         this.DOM.el.style.transform = `translate3d(${this.renderedStyles['tx'].previous}px, ${this.renderedStyles['ty'].previous}px, 0)`;
         this.DOM.text.style.transform = `translate3d(${-this.renderedStyles['tx'].previous*0.6}px, ${-this.renderedStyles['ty'].previous*0.6}px, 0)`;
-
+    
         requestAnimationFrame(() => this.render());
     }
     
@@ -149,8 +158,6 @@ export default class ButtonCtrl {
         this.state.hover = true;
         this.DOM.el.classList.add('button--hover');
         this.acceptedOptions.customCursor.enter();
-        
-        document.body.classList.add('active');
         
         gsap.killTweensOf(this.DOM.filler);
         gsap.killTweensOf(this.DOM.textinner);
